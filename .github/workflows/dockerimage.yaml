@@ -27,12 +27,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-      - name: Create Updated Dockerfile
-        run: |
-          echo FROM ghcr.io/${{ github.repository }}@${{ steps.build.outputs.digest  }} > binder/Dockerfile
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
-          git add .
-          git commit -m "Update Dockerfile"
-          git push
+            ghcr.io/juliapluto/pluto:latest

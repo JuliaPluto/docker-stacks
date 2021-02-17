@@ -1,9 +1,7 @@
 name: pluto-notebook
 
 on:
-    push:
-        branches:
-            - main
+    push
 jobs:
   build:
     runs-on: ubuntu-latest

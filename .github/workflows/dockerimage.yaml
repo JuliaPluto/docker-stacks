@@ -28,3 +28,13 @@ jobs:
           push: true
           tags: |
             ghcr.io/juliapluto/pluto:latest
+      - name: Build and push
+        id: build-2
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile-jupyter
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/juliapluto/pluto-jupyter:latest

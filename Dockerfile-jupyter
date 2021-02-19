@@ -22,7 +22,9 @@ ENV PATH="/root/mambaforge/bin:${PATH}"
 RUN apt-get update -y &&\ 
     apt-get upgrade -y &&\
     curl -fsSL https://deb.nodesource.com/setup_14.x | bash - &&\
-    apt-get install -y nodejs git
+    apt-get install -y nodejs git &&\
+    apt-get clean -y &&\
+    apt-get autoclean -y
 
 RUN set -eux; \
     curl -LJO --output Mambaforge-Linux-x86_64.sh \
@@ -47,3 +49,5 @@ EXPOSE 8888
 
 VOLUME ${NOTEBOOK_DIR}
 WORKDIR ${NOTEBOOK_DIR}
+
+CMD ["jupyter", "notebook", "--ip", "0.0.0.0"]

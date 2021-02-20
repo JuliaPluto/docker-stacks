@@ -42,9 +42,7 @@ RUN pip install git+https://github.com/pankgeorg/pluto-on-jupyterlab.git --no-ca
     rm -rf ~/.cache
 
 USER root
-RUN ln -s `which jupyter` /usr/local/bin/jupyter && \
-    ln -s run_pluto.sh /usr/local/bin/run_pluto.sh
-
+RUN ln -s `which jupyter` /usr/local/bin/jupyter
 
 EXPOSE 1234
 EXPOSE 8888

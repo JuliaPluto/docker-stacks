@@ -45,7 +45,8 @@ RUN jupyter labextension install @jupyterlab/server-proxy && \
     rm -rf ~/.cache
 
 USER root
-RUN ln -s `which jupyter` /usr/local/bin/jupyter
+RUN ln -s `which jupyter` /usr/local/bin/jupyter && \
+    ln -s run_pluto.sh /usr/local/bin/run_pluto.sh
 
 
 EXPOSE 1234

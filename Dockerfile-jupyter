@@ -17,7 +17,7 @@ RUN mkdir -p ${USER_HOME_DIR}/.julia/environments/v1.6/ &&\
     julia -e "import Pkg; Pkg.activate(); Pkg.instantiate(); Pkg.precompile();" &&\
     chown -R ${USER}:${USER} ${USER_HOME_DIR} && chown -R ${USER}:${USER} ${USER_HOME_DIR}/.julia/
 
-ENV PATH="${USER_HOME_DIR}/mambaforge/bin:${PATH}"
+ENV PATH="${PATH}:${USER_HOME_DIR}/mambaforge/bin:/usr/local/julia/bin"
 
 RUN apt-get update -y &&\ 
     apt-get upgrade -y &&\

@@ -27,6 +27,7 @@ RUN apt-get update -y &&\
     apt-get autoclean -y
 
 USER ${USER}
+ENV PATH="${PATH}:${USER_HOME_DIR}/mambaforge/bin:/usr/local/julia/bin"
 
 RUN set -eux; \
     curl -LJO --output /home/${USER}/Mambaforge-Linux-x86_64.sh \

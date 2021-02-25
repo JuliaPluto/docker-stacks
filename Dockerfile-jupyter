@@ -18,7 +18,7 @@ RUN apt-get update -y &&\
 
 USER ${USER}
 
-COPY --chown ${USER}:${USER} . ${USER_HOME_DIR}/
+COPY --chown=${USER}:${USER} . ${USER_HOME_DIR}/
 WORKDIR ${USER_HOME_DIR}
 
 RUN mkdir -p ${USER_HOME_DIR}/.julia/environments/v1.6/ &&\

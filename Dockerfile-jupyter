@@ -9,16 +9,6 @@ ENV JULIA_NUM_THREADS 100
 RUN useradd -m -d ${USER_HOME_DIR} ${USER} && \
     mkdir -p ${NOTEBOOK_DIR}
 
-COPY . ${USER_HOME_DIR}/
-WORKDIR ${USER_HOME_DIR}
-
-RUN mkdir -p ${USER_HOME_DIR}/.julia/environments/v1.6/ &&\
-    cp *.toml ${USER_HOME_DIR}/.julia/environments/v1.6/ &&\
-    julia -e "import Pkg; Pkg.activate(); Pkg.instantiate(); Pkg.precompile();" &&\
-    chown -R ${USER}:${USER} ${USER_HOME_DIR} && chown -R ${USER}:${USER} ${USER_HOME_DIR}/.julia/
-
-ENV PATH="${PATH}:${USER_HOME_DIR}/mambaforge/bin:/usr/local/julia/bin"
-
 RUN apt-get update -y &&\ 
     apt-get upgrade -y &&\
     curl -fsSL https://deb.nodesource.com/setup_14.x | bash - &&\
@@ -27,6 +17,14 @@ RUN apt-get update -y &&\
     apt-get autoclean -y
 
 USER ${USER}
+
+COPY --chown ${USER}:${USER} . ${USER_HOME_DIR}/
+WORKDIR ${USER_HOME_DIR}
+
+RUN mkdir -p ${USER_HOME_DIR}/.julia/environments/v1.6/ &&\
+    cp *.toml ${USER_HOME_DIR}/.julia/environments/v1.6/ &&\
+    julia -e "import Pkg; Pkg.activate(); Pkg.instantiate(); Pkg.precompile();"
+
 ENV PATH="${PATH}:${USER_HOME_DIR}/mambaforge/bin:/usr/local/julia/bin"
 
 RUN set -eux; \
@@ -43,8 +41,7 @@ RUN pip install git+https://github.com/pankgeorg/pluto-on-jupyterlab.git --no-ca
     rm -rf ~/.cache
 
 USER root
-RUN ln -s `which jupyter` /usr/local/bin/jupyter &&\
-    chown -R ${USER}:${USER} ${USER_HOME_DIR} && chown -R ${USER}:${USER} ${USER_HOME_DIR}/.julia/
+RUN ln -s `which jupyter` /usr/local/bin/jupyter
 
 EXPOSE 1234
 EXPOSE 8888

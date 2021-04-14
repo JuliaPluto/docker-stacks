@@ -11,6 +11,7 @@ For more info check out [official documentation](https://docs.nvidia.com/datacen
 Build container using `docker build -t pluto-notebook .`
 
 Now we can run our image with `docker run -t -p 1234:1234 --gpus all pluto-notebook`.
+You can skip building and use with `docker run -t -p 1234:1234 --gpus all ghcr.io/juliapluto/pluto-cuda:latest`, using our docker image from this repo. Note that for reproducible setups it's best to tag the exact `@sha256:...`.
 This will start our container and attach it to host port 1234. `--gpus all` flag tells docker to give container access to all Nvidia GPUs attached to the host machine.
 
 First lets install `CUDA.jl`

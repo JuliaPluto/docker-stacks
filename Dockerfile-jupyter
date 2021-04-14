@@ -1,0 +1,50 @@
+FROM julia:1.6.0-rc2
+
+ENV USER jovyan
+ENV USER_HOME_DIR /home/${USER}
+ENV JULIA_DEPOT_PATH ${USER_HOME_DIR}/.julia
+ENV NOTEBOOK_DIR ${USER_HOME_DIR}/notebooks
+ENV JULIA_NUM_THREADS 100
+
+RUN useradd -m -d ${USER_HOME_DIR} ${USER} && \
+    mkdir -p ${NOTEBOOK_DIR}
+
+RUN apt-get update -y &&\ 
+    apt-get upgrade -y &&\
+    curl -fsSL https://deb.nodesource.com/setup_14.x | bash - &&\
+    apt-get install -y nodejs git &&\
+    apt-get clean -y &&\
+    apt-get autoclean -y
+
+USER ${USER}
+
+COPY --chown=${USER}:${USER} . ${USER_HOME_DIR}/
+WORKDIR ${USER_HOME_DIR}
+
+RUN mkdir -p ${USER_HOME_DIR}/.julia/environments/v1.6/ &&\
+    cp *.toml ${USER_HOME_DIR}/.julia/environments/v1.6/ &&\
+    julia -e "import Pkg; Pkg.activate(); Pkg.instantiate(); Pkg.precompile();"
+
+ENV PATH="${PATH}:${USER_HOME_DIR}/mambaforge/bin:/usr/local/julia/bin"
+
+RUN set -eux; \
+    curl -LJO --output /home/${USER}/Mambaforge-Linux-x86_64.sh \
+    https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh && \
+    bash /home/${USER}/Mambaforge-Linux-x86_64.sh -b && \
+    rm -f Mambaforge-Linux-x86_64.sh 
+
+RUN set -eux; \
+    mamba install -y jupyterlab && \
+    mamba clean --all -f -y
+
+RUN pip install git+https://github.com/pankgeorg/pluto-on-jupyterlab.git --no-cache-dir && \
+    rm -rf ~/.cache
+
+USER root
+RUN ln -s `which jupyter` /usr/local/bin/jupyter
+
+EXPOSE 1234
+EXPOSE 8888
+USER ${USER}
+
+CMD ["jupyter", "notebook", "--ip", "0.0.0.0"]

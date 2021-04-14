@@ -1,4 +1,4 @@
-FROM julia:1.6.0-rc2
+FROM julia:1.6.0
 
 ENV USER pluto
 ENV USER_HOME_DIR /home/${USER}

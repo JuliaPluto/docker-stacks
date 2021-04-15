@@ -15,7 +15,9 @@ WORKDIR ${USER_HOME_DIR}
 RUN mkdir -p /home/pluto/.julia/environments/v1.6/ &&\
     cp ./PlutoSliderServer/*.toml /home/pluto/.julia/environments/v1.6/ &&\
     julia -e "import Pkg; Pkg.activate(); Pkg.instantiate(); Pkg.precompile();" &&\
-    chown -R ${USER} ${USER_HOME_DIR}
+    chown -R ${USER} ${USER_HOME_DIR} && \
+    apt-get update && apt-get install -y \
+    curl tar git vim
 
 USER ${USER}
 

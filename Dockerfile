@@ -23,4 +23,4 @@ EXPOSE 1234
 VOLUME ${NOTEBOOK_DIR}
 WORKDIR ${NOTEBOOK_DIR}
 
-CMD [ "julia", "--project=/home/pluto", "/home/pluto/startup.jl" ]
+CMD [ "julia", "--project=/home/pluto", "-e", "import Pluto; Pluto.run(host=\"0.0.0.0\", port=1234, launch_browser=false, require_secret_for_open_links=false, require_secret_for_access=false)"]

@@ -45,6 +45,7 @@ USER root
 RUN ln -s `which jupyter` /usr/local/bin/jupyter
 RUN julia create_sysimage.jl
 
+RUN chown -R ${USER} ${USER_HOME_DIR}
 EXPOSE 1234
 EXPOSE 8888
 USER ${USER}

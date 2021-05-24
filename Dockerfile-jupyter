@@ -12,7 +12,7 @@ RUN useradd -m -d ${USER_HOME_DIR} ${USER} && \
 RUN apt-get update -y &&\ 
     apt-get upgrade -y &&\
     curl -fsSL https://deb.nodesource.com/setup_14.x | bash - &&\
-    apt-get install -y nodejs git build-essential &&\
+    apt-get install -y --no-install-recommends nodejs git build-essential &&\
     apt-get clean -y &&\
     apt-get autoclean -y
 
@@ -25,7 +25,6 @@ RUN mkdir -p ${USER_HOME_DIR}/.julia/environments/v1.6/ &&\
     cp *.toml ${USER_HOME_DIR}/.julia/environments/v1.6/ &&\
     julia -e "import Pkg; Pkg.activate(); Pkg.instantiate(); Pkg.precompile();"
 
-RUN julia create_sysimage.jl
 
 ENV PATH="${PATH}:${USER_HOME_DIR}/mambaforge/bin:/usr/local/julia/bin"
 
@@ -44,6 +43,7 @@ RUN pip install git+https://github.com/pankgeorg/pluto-on-jupyterlab.git --no-ca
 
 USER root
 RUN ln -s `which jupyter` /usr/local/bin/jupyter
+RUN julia create_sysimage.jl
 
 EXPOSE 1234
 EXPOSE 8888

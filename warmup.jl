@@ -15,28 +15,6 @@ Pluto.readwrite(original, path)
 nb = Pluto.load_notebook(Pluto.tamepath(path));
 session.notebooks[nb.notebook_id] = nb;
 
-@info "Running notebook"
-Pluto.update_save_run!(session, nb, nb.cells; run_async=false, prerender_text=true)
-
-original = joinpath(pathof(Pluto) |> dirname |> dirname, "sample", "PlutoUI.jl.jl")
-
-# so that we don't overwrite the file:
-Pluto.readwrite(original, path)
-
-@info "Loading notebook"
-nb = Pluto.load_notebook(Pluto.tamepath(path));
-session.notebooks[nb.notebook_id] = nb;
-
-@info "Running notebook"
-Pluto.update_save_run!(session, nb, nb.cells; run_async=false, prerender_text=true)
-
-# nice! we ran the notebook, so we already precompiled a lot
-
-original = joinpath(pathof(Pluto) |> dirname |> dirname, "sample", "Plots.jl.jl")
-
-# so that we don't overwrite the file:
-Pluto.readwrite(original, path)
-
 @info "Loading notebook"
 nb = Pluto.load_notebook(Pluto.tamepath(path));
 session.notebooks[nb.notebook_id] = nb;

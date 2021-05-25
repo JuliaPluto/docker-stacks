@@ -1,4 +1,4 @@
-FROM julia:1.6.1
+FROM julia:1.6.1 as builder
 
 ENV USER jovyan
 ENV USER_HOME_DIR /home/${USER}
@@ -25,29 +25,40 @@ RUN mkdir -p ${USER_HOME_DIR}/.julia/environments/v1.6/ &&\
     cp *.toml ${USER_HOME_DIR}/.julia/environments/v1.6/ &&\
     julia -e "import Pkg; Pkg.activate(); Pkg.instantiate(); Pkg.precompile();"
 
-
-ENV PATH="${PATH}:${USER_HOME_DIR}/mambaforge/bin:/usr/local/julia/bin"
-
-RUN set -eux; \
-    curl -LJO --output /home/${USER}/Mambaforge-Linux-x86_64.sh \
-    https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh && \
-    bash /home/${USER}/Mambaforge-Linux-x86_64.sh -b && \
-    rm -f Mambaforge-Linux-x86_64.sh 
-
-RUN set -eux; \
-    mamba install -y jupyterlab && \
-    mamba clean --all -f -y
-
-RUN pip install git+https://github.com/pankgeorg/pluto-on-jupyterlab.git --no-cache-dir && \
-    rm -rf ~/.cache
-
 USER root
-RUN ln -s `which jupyter` /usr/local/bin/jupyter
 RUN julia create_sysimage.jl
 
-RUN chown -R ${USER} ${USER_HOME_DIR}
-EXPOSE 1234
-EXPOSE 8888
-USER ${USER}
 
-CMD ["jupyter", "notebook", "--ip", "0.0.0.0"]
+FROM jupyter/base-notebook:hub-1.4.1
+
+USER root
+RUN wget https://julialang-s3.julialang.org/bin/linux/x64/1.6/julia-1.6.1-linux-x86_64.tar.gz && \
+    tar -xvzf julia-1.6.1-linux-x86_64.tar.gz && \
+    mv julia-1.6.1 /opt/ && \
+    ln -s /opt/julia-1.6.1/bin/julia /usr/local/bin/julia && \
+    rm julia-1.6.1-linux-x86_64.tar.gz
+
+COPY --from=builder /usr/local/julia/lib/julia/sys.so /usr/local/julia/lib/julia/sys.so
+
+USER ${NB_USER}
+
+COPY --chown=${NB_USER}:users ./runpluto.sh ./runpluto.sh
+
+COPY --chown=${NB_USER}:users ./Project.toml ./Project.toml
+COPY --chown=${NB_USER}:users ./Manifest.toml ./Manifest.toml
+
+ENV USER_HOME_DIR /home/${NB_USER}
+ENV JULIA_PROJECT ${USER_HOME_DIR}
+ENV JULIA_DEPOT_PATH ${USER_HOME_DIR}/.julia
+WORKDIR ${USER_HOME_DIR}
+
+RUN julia -e "import Pkg; Pkg.Registry.update(); Pkg.instantiate();"
+RUN apt-get update && apt-get install --no-install-recommends -y git && apt-get clean -y && apt-get autoclean -y
+
+USER ${NB_USER}
+
+RUN jupyter labextension install @jupyterlab/server-proxy && \
+    jupyter lab build && \
+    jupyter lab clean && \
+    pip install git+https://github.com/pankgeorg/pluto-on-jupyterlab.git --no-cache-dir && \
+    rm -rf ~/.cache
